@@ -16,15 +16,14 @@ const getContactById = async (contactId) => {
   return contactToFind;
 };
 
-const removeContact = async (contactId) => {
-  let contacts = await listContacts();
+const removeContactById = async (contactId) => {
+  const contacts = await listContacts();
   const contactToDelete = contacts.find(contact => contact.id === contactId);
   if (!contactToDelete) {
     return null;
   };
   const remainingСontacts = contacts.filter(contact => contact.id !== contactId);
-  contacts = remainingСontacts;
-  await fs.writeFile(contactsPath, JSON.stringify(contacts));
+  await fs.writeFile(contactsPath, JSON.stringify(remainingСontacts));
   return contactToDelete;
 };
 
@@ -54,7 +53,6 @@ const updateContact = async (contactId, body) => {
   if (phone !== undefined) {
     contactToUpdate.phone = phone;
   }
-  console.log(contactToUpdate);
   await fs.writeFile(contactsPath, JSON.stringify(contacts));
   return contactToUpdate;
 };
@@ -62,7 +60,7 @@ const updateContact = async (contactId, body) => {
 module.exports = {
   listContacts,
   getContactById,
-  removeContact,
+  removeContactById,
   addContact,
   updateContact,
 };
