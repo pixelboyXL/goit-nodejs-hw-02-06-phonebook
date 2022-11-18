@@ -19,7 +19,11 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  res.status(400).json({ message: err.message });
+  const { status = 500, message = "Server error" } = err;
+  if (err.name === 'ValidationError' || err.name === 'Error') {
+    return res.status(400).json({ message });
+  };
+  res.status(status).json({ message })
 });
 
 module.exports = app;
