@@ -43,7 +43,6 @@ const updateSomeContact = async (req, res, next) => {
 const updateStatusContact = async (req, res, next) => {
     const { contactId } = req.params;
     const { favorite } = req.body;
-    console.log(favorite);
     if (favorite === undefined) {
         throw new Error("Missing field favorite");
     }
