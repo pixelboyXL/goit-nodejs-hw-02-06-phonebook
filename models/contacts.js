@@ -38,15 +38,15 @@ const addContact = async (body) => {
 };
 
 const updateContact = async (contactId, body) => {
-    const { name, email, phone} = body;
-    const contacts = await listContacts();
-    const [contactToUpdate] = contacts.filter((item) => item.id === contactId);
-    contactToUpdate.name = name;
-    contactToUpdate.email = email;
-    contactToUpdate.phone = phone;
-    const newContacts = [...contacts];
-    await fs.writeFile(contactsPath, JSON.stringify(newContacts));
-    return contactToUpdate;
+  const { name, email, phone} = body;
+  const contacts = await listContacts();
+  const [contactToUpdate] = contacts.filter((item) => item.id === contactId);
+  contactToUpdate.name = name;
+  contactToUpdate.email = email;
+  contactToUpdate.phone = phone;
+  const newContacts = [...contacts];
+  await fs.writeFile(contactsPath, JSON.stringify(newContacts));
+  return contactToUpdate;
 };
 
 module.exports = {
