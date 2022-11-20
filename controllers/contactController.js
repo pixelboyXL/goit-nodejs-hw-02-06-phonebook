@@ -5,11 +5,11 @@ const getAllContacts = async (req, res) => {
     res.status(200).json({ data: allContacts });
 };
 
-const getOneContactById = async (req, res, next) => {
+const getOneContactById = async (req, res) => {
     const { contactId } = req.params;
     const contact = await Contact.findById(contactId);
     if (!contact) {
-        return next();
+        return res.status(404).json({ message: "Not found" });
     };
     res.status(200).json({ data: contact });
 };
@@ -19,22 +19,22 @@ const addNewContact = async (req, res) => {
     res.status(201).json({ data: newContact });
 };
 
-const deleteContactById = async (req, res, next) => {
+const deleteContactById = async (req, res) => {
     const { contactId } = req.params;
     const contactToDelete = await Contact.findById(contactId);
     if (contactToDelete === null) {
-        return next();
+        return res.status(404).json({ message: "Not found" });
     };
     await Contact.findByIdAndDelete(contactToDelete);
     res.status(200).json({ message: "Contact deleted" });
 };
 
-const updateSomeContact = async (req, res, next) => {
+const updateSomeContact = async (req, res) => {
     const { contactId } = req.params;
     const { body } = req;
     const contactToUpdate = await Contact.findById(contactId);
     if (contactToUpdate === null) {
-        return next();
+        return res.status(404).json({ message: "Not found" });
     };
     await Contact.findByIdAndUpdate(contactToUpdate, body);
     res.status(200).json({ data: contactToUpdate });
@@ -51,7 +51,7 @@ const updateStatusContact = async (req, res, next) => {
         return next();
     };
     await Contact.findByIdAndUpdate(contactToUpdate, { favorite });
-    res.status(200).json({ data: contactToUpdate.favorite });
+    res.status(200).json({ data: contactToUpdate });
 };
 
 module.exports = {
