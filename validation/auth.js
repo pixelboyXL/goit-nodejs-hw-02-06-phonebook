@@ -4,6 +4,7 @@ const { User } = require("../../models/user.model");
 
 const { JWT_SECRET } = process.env;
 
+// TODO for next version
 async function auth(req, res, next) {
     console.log("auth middleware", req.headers.authorization);
     const authHeader = req.headers.authorization || "";
