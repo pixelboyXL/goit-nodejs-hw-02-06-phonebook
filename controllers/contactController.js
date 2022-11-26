@@ -3,7 +3,7 @@ const { createNotFoundError } = require("../helpers");
 
 const getAllContacts = async (req, res) => {
     const allContacts = await Contact.find();
-    res.status(200).json({ data: allContacts });
+    return res.status(200).json({ data: allContacts });
 };
 
 const getOneContactById = async (req, res, next) => {
@@ -17,7 +17,7 @@ const getOneContactById = async (req, res, next) => {
 
 const addNewContact = async (req, res) => {
     const newContact = await Contact.create(req.body);
-    res.status(201).json({ data: newContact });
+    return res.status(201).json({ data: newContact });
 };
 
 const deleteContactById = async (req, res, next) => {
