@@ -22,8 +22,17 @@ const changeContactStatusSchema = Joi.object({
     favorite: Joi.bool().required(),
 });
 
+const authSchema = Joi.object({
+    email: Joi.string().email({
+        minDomainSegments: 2,
+        tlds: { allow: ["com", "net"] },
+    }).required(),
+    password: Joi.string().min(6).required(),
+});
+
 module.exports = {
     addContactSchema,
     changeContactSchema,
     changeContactStatusSchema,
+    authSchema,
 };
