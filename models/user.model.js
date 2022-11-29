@@ -21,6 +21,7 @@ const userSchema = new Schema(
         token: {
             type: String,
         },
+        avatarURL: String,
     },
     {
         timestamps: true,
