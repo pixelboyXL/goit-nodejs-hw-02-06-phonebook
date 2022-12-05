@@ -2,8 +2,9 @@ const { User } = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
-// const fs = require("fs/promises");
-// const path = require("path");
+const fs = require("fs/promises");
+const path = require("path");
+const jimp = require("jimp");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -12,8 +13,7 @@ const { JWT_SECRET } = process.env;
 
 const register = async (req, res, next) => {
     const { email, password } = req.body;
-    const avatarURL = gravatar.url(email, { s: "200", r: "pg", d: "404" });
-    console.log(avatarURL);
+    const avatarURL = gravatar.url(email);
     const user = await User.findOne({ email });
     if (user) {
         return res.status(409).json({ message: "Email is already in use" });
@@ -77,29 +77,25 @@ const current = async (req, res) => {
     return res.status(401).json({ message: "Not authorized" });
 };
 
-// const avatar = async (req, res, next) => {
-//     console.log(req.file);
-//     const newPath = path.join(__dirname, "../public/avatars", req.file.filename);
-//     await fs.rename(req.file.path, newPath);
-//     const movieId = req.params.id;
-//     console.log(req.params.id);
-//     const movieImage = "/public/images/" + req.file.filename;
-//     const movieS = await Movie.findById(movieId);
-//     console.log(movieS);
-//     const savedMovie = await Movie.findByIdAndUpdate(
-//         movieId,
-//         {
-//             image: movieImage,
-//         },
-//         { new: true }
-//     );
-//     return res.status(201).json({ data: { movie: savedMovie } });
-// };
+const avatar = async (req, res, next) => {
+    const { user, file } = req;
+    file.filename = user._id + ".jpeg";
+    const image = await jimp.read(file.path);
+    image.resize(250, 250);
+    await image.writeAsync(file.path);
+    const newPath = path.join(__dirname, "../public/avatars", file.filename);
+    await fs.rename(file.path, newPath);
+    user.avatarURL = "/avatars/" + file.filename;
+    await User.findByIdAndUpdate(user._id, user);
+    return res.json({
+        avatarURL: "/avatars/" + file.filename
+    });
+};
 
 module.exports = {
     register,
     login,
     logout,
     current,
-    // avatar,
+    avatar,
 };
