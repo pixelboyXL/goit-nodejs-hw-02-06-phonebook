@@ -18,4 +18,6 @@ router.post("/current", tryCatchWrapper(auth), tryCatchWrapper(users.current));
 
 router.patch("/avatars", tryCatchWrapper(auth), tryCatchWrapper(upload.single("avatar")), tryCatchWrapper(users.avatar));
 
+router.get("/verify/:verificationToken", tryCatchWrapper(users.verify));
+
 module.exports = router;

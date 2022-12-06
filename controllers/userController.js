@@ -5,6 +5,8 @@ const gravatar = require("gravatar");
 const fs = require("fs/promises");
 const path = require("path");
 const jimp = require("jimp");
+const { mailTrap } = require("../routes/middleware/mailTrap");
+const { nanoid } = require("nanoid");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -19,8 +21,10 @@ const register = async (req, res, next) => {
         return res.status(409).json({ message: "Email is already in use" });
     };
     try {
-        const newUser = new User({ email, password, avatarURL });
+        const verificationToken = nanoid();
+        const newUser = new User({ email, password, avatarURL, verificationToken });
         await newUser.save();
+        await mailTrap({ email, token: verificationToken });
         return res.status(201).json({
         data: {
             user: {
@@ -37,6 +41,9 @@ const register = async (req, res, next) => {
 const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+    if (!user.verify) {
+        return res.status(401).json({ message: "Email is not verified" });
+    }
     const isPasswordTheSame = await bcrypt.compare(password, user.password);
     if (!user || !isPasswordTheSame) {
         return res.status(401).json({ message: "Email or password is wrong" });
@@ -92,10 +99,35 @@ const avatar = async (req, res, next) => {
     });
 };
 
+const verify = async (req, res, next) => {
+    const { verificationToken } = req.params;
+    const user = await User.findOne({
+        verificationToken,
+    });
+    if (!user) {
+        return res.status(404).json({ message: "User not found" });
+    };
+    if (!user.verify) {
+        await User.findByIdAndUpdate(user._id, {
+            verify: true,
+            verificationToken: null,
+        });
+        return res.json({
+            message: "Verification successful",
+        });
+    };
+    if (user.verify) {
+        return res.json({
+            message: "Your Email already verified",
+        });
+    };
+};
+
 module.exports = {
     register,
     login,
     logout,
     current,
     avatar,
+    verify,
 };
