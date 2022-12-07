@@ -130,10 +130,10 @@ const repeatVerify = async (req, res, next) => {
     };
     const user = await User.findOne({ email });
     if (!user) {
-        return res.status(404).json({ message: "Not found!" });
+        return res.status(404).json({ message: "User not found" });
     };
     if (user.verify) {
-        return res.status(400).json({ message: "Verification has already been passed" });
+        return res.status(400).json({ message: "Your Email already verified" });
     };
     if (!user.verify) {
         await mailTrap({ email, token: user.verificationToken });
