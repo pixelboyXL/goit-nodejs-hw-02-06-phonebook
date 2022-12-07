@@ -42,7 +42,7 @@ const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user.verify) {
-        return res.status(401).json({ message: "Email is not verified" });
+        return res.status(401).json({ message: "Email is not verified, please check you mailbox" });
     }
     const isPasswordTheSame = await bcrypt.compare(password, user.password);
     if (!user || !isPasswordTheSame) {
@@ -123,6 +123,24 @@ const verify = async (req, res, next) => {
     };
 };
 
+const repeatVerify = async (req, res, next) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ message: "Missing required field email" });
+    };
+    const user = await User.findOne({ email });
+    if (!user) {
+        return res.status(404).json({ message: "Not found!" });
+    };
+    if (user.verify) {
+        return res.status(400).json({ message: "Verification has already been passed" });
+    };
+    if (!user.verify) {
+        await mailTrap({ email, token: user.verificationToken });
+        return res.status(200).json({ message: "Verification code sent to your email" });
+    };
+};
+
 module.exports = {
     register,
     login,
@@ -130,4 +148,5 @@ module.exports = {
     current,
     avatar,
     verify,
+    repeatVerify,
 };
