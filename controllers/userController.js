@@ -84,7 +84,7 @@ const current = async (req, res) => {
     return res.status(401).json({ message: "Not authorized" });
 };
 
-const avatar = async (req, res, next) => {
+const avatar = async (req, res) => {
     const { user, file } = req;
     file.filename = user._id + ".jpeg";
     const image = await jimp.read(file.path);
@@ -99,7 +99,7 @@ const avatar = async (req, res, next) => {
     });
 };
 
-const verify = async (req, res, next) => {
+const verify = async (req, res) => {
     const { verificationToken } = req.params;
     const user = await User.findOne({
         verificationToken,
@@ -118,27 +118,19 @@ const verify = async (req, res, next) => {
     };
     if (user.verify) {
         return res.json({
-            message: "Your Email already verified",
+            message: "Verification has already been passed",
         });
     };
 };
 
-const repeatVerify = async (req, res, next) => {
+const repeatVerify = async (req, res) => {
     const { email } = req.body;
-    if (!email) {
-        return res.status(400).json({ message: "Missing required field email" });
-    };
     const user = await User.findOne({ email });
-    if (!user) {
-        return res.status(404).json({ message: "User not found" });
-    };
     if (user.verify) {
-        return res.status(400).json({ message: "Your Email already verified" });
+        return res.status(400).json({ message: "Verification has already been passed" });
     };
-    if (!user.verify) {
-        await mailTrap({ email, token: user.verificationToken });
-        return res.status(200).json({ message: "Verification code sent to your email" });
-    };
+    await mailTrap({ email, token: user.verificationToken });
+    return res.status(200).json({ message: "Verification email sent" });
 };
 
 module.exports = {
