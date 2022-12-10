@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { validationBody } = require("../middleware/validationBody");
-const { authSchema } = require("../middleware/validationSchemas");
+const { authSchema, verifyShema } = require("../middleware/validationSchemas");
 const { tryCatchWrapper } = require("../../helpers");
 const { auth } = require("../middleware/auth");
 const users = require("../../controllers/userController");
@@ -17,5 +17,9 @@ router.post("/logout", tryCatchWrapper(auth), tryCatchWrapper(users.logout));
 router.post("/current", tryCatchWrapper(auth), tryCatchWrapper(users.current));
 
 router.patch("/avatars", tryCatchWrapper(auth), tryCatchWrapper(upload.single("avatar")), tryCatchWrapper(users.avatar));
+
+router.get("/verify/:verificationToken", tryCatchWrapper(users.verify));
+
+router.post('/verify', validationBody(verifyShema), tryCatchWrapper(users.repeatVerify));
 
 module.exports = router;
