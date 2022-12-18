@@ -8,9 +8,6 @@ const jimp = require("jimp");
 const { mailTrap } = require("../routes/middleware/mailTrap");
 const { nanoid } = require("nanoid");
 
-const dotenv = require("dotenv");
-dotenv.config();
-
 const { JWT_SECRET } = process.env;
 
 const register = async (req, res, next) => {

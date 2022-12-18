@@ -1,8 +1,5 @@
 const nodemailer = require("nodemailer");
 
-const dotenv = require("dotenv");
-dotenv.config();
-
 const { USER_MAILTRAP, PASSWORD_MAILTRAP } = process.env;
 
 const mailTrap = async ({email, token}) => {
